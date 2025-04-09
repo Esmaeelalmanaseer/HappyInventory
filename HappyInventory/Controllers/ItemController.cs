@@ -1,5 +1,6 @@
 ﻿using HappyInventory.API.Helper.ResponseAPI;
 using HappyInventory.API.Models.DTOs.Item;
+using HappyInventory.API.Models.Sharing;
 using HappyInventory.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,11 +22,11 @@ public class ItemController : ControllerBase
     }
 
     [HttpGet("get-all-items")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] ItemParams ItemParamsObj)
     {
         try
         {
-            List<ItemResponseDto?> items = await _itemService.GetAllAsync();
+            List<ItemResponseDto?> items = await _itemService.GetAllAsync(ItemParamsObj);
             return items is null
                 ? BadRequest(new ResponseAPI(400))
                 : Ok(items);

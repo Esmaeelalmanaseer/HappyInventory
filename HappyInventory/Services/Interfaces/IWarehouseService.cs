@@ -1,12 +1,13 @@
 ﻿using HappyInventory.API.Models.DTOs.Warehouse;
 using HappyInventory.API.Models.Entities;
+using HappyInventory.API.Models.Sharing;
 using System.Linq.Expressions;
 
 namespace HappyInventory.API.Services.Interfaces;
 
 public interface IWarehouseService
 {
-    Task<List<WarehouseResponseDto?>> GetAllAsync();
+    Task<List<WarehouseResponseDto?>> GetAllAsync(WarehouseParams WarehouseParams);
 
 
     Task<List<WarehouseResponseDto?>> GetAllAsyncByConditionAsync(Expression<Func<Warehouse, bool>> conditionExpression);

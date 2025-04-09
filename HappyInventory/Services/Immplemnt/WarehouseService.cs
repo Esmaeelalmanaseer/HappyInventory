@@ -2,6 +2,7 @@
 using HappyInventory.API.Models.DTOs.Warehouse;
 using HappyInventory.API.Models.Entities;
 using HappyInventory.API.Models.IRepositories;
+using HappyInventory.API.Models.Sharing;
 using HappyInventory.API.Services.Interfaces;
 using System.Linq.Expressions;
 
@@ -39,9 +40,9 @@ public class WarehouseService : IWarehouseService
         return await _warehouseRepositry.DeletAsync(WarehouseobjID);
     }
 
-    public async Task<List<WarehouseResponseDto?>> GetAllAsync()
+    public async Task<List<WarehouseResponseDto?>> GetAllAsync(WarehouseParams WarehouseParams)
     {
-        IEnumerable<Warehouse> LstWarehouse = await _warehouseRepositry.GetAllAsync();
+        IEnumerable<Warehouse> LstWarehouse = await _warehouseRepositry.GetAllAsync(WarehouseParams);
         if (LstWarehouse.Any())
         {
             IEnumerable<WarehouseResponseDto> LstItemREsponse = _mapper.Map<IEnumerable<WarehouseResponseDto>>(LstWarehouse);

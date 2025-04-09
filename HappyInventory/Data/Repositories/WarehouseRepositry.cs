@@ -1,6 +1,8 @@
 ﻿using HappyInventory.API.Models.Entities;
 using HappyInventory.API.Models.IRepositories;
+using HappyInventory.API.Models.Sharing;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace HappyInventory.API.Data.Repositories;
@@ -32,9 +34,15 @@ public class WarehouseRepositry : IWarehouseRepositry
         return affectedRowsCount > 0;
     }
 
-    public async Task<IEnumerable<Warehouse>> GetAllAsync()
+    public async Task<IEnumerable<Warehouse>> GetAllAsync(WarehouseParams WarehouseParams)
     {
-        return await _dbContext.Warehouses.AsNoTracking().ToListAsync();
+        var LstWarehouse=_dbContext.Warehouses.AsQueryable();
+        if (!string.IsNullOrEmpty(WarehouseParams.sort))
+            LstWarehouse= LstWarehouse.Where(s => s.Name.Contains(WarehouseParams.sort) || s.Country.Contains(WarehouseParams.sort) || s.City.Contains(WarehouseParams.sort));
+
+        LstWarehouse= LstWarehouse.Skip((WarehouseParams.PageNumber - 1) * WarehouseParams.pageSize).Take(WarehouseParams.pageSize);
+
+        return LstWarehouse;
     }
 
     public async Task<IEnumerable<Warehouse?>> GetAllAsyncByConditionAsync(Expression<Func<Warehouse, bool>> conditionExpression)

@@ -26,6 +26,7 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("con")));
         builder.Services.AddAutoMapper(typeof(ItemProfile).Assembly);
+        builder.Services.AddCors();
         builder.Services.AddIdentity<User, IdentityRole>(options =>
         {
             options.Password.RequireDigit = true;
@@ -115,7 +116,12 @@ public class Program
         }
         app.UseMiddleware<ExeptionsMiddleware>();
         app.UseHttpsRedirection();
-
+        app.UseCors(options =>
+        {
+            options.AllowAnyMethod();
+            options.AllowAnyOrigin();
+            options.AllowAnyHeader();
+        });
         app.UseAuthentication();
         app.UseAuthorization();
 

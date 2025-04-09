@@ -1,6 +1,8 @@
 ﻿using HappyInventory.API.Models.Entities;
 using HappyInventory.API.Models.IRepositories;
+using HappyInventory.API.Models.Sharing;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace HappyInventory.API.Data.Repositories;
@@ -13,7 +15,7 @@ public class ItemRepositry : IItemRepositry
     {
         _dbContext = dbContext;
     }
-    public async Task< Item?> AddAsync( Item Itemobj)
+    public async Task<Item?> AddAsync(Item Itemobj)
     {
         await _dbContext.Items.AddAsync(Itemobj);
         await _dbContext.SaveChangesAsync();
@@ -22,7 +24,7 @@ public class ItemRepositry : IItemRepositry
 
     public async Task<bool> DeletAsync(int ItemobjID)
     {
-         Item? ItemtOBJ = await _dbContext.Items.AsNoTracking().SingleOrDefaultAsync(x => x.Id == ItemobjID);
+        Item? ItemtOBJ = await _dbContext.Items.AsNoTracking().SingleOrDefaultAsync(x => x.Id == ItemobjID);
         if (ItemtOBJ is null)
         {
             return false;
@@ -32,24 +34,34 @@ public class ItemRepositry : IItemRepositry
         return affectedRowsCount > 0;
     }
 
-    public async Task<IEnumerable< Item>> GetAllAsync()
+    public async Task<IEnumerable<Item>> GetAllAsync(ItemParams ItemParams)
     {
-        return await _dbContext.Items.AsNoTracking().ToListAsync();
+        IQueryable<Item>? LstItem = _dbContext.Items.AsQueryable();
+
+        if (ItemParams.WarehouseId.HasValue)
+            LstItem= LstItem.Where(w => w.WarehouseId == ItemParams.WarehouseId);
+
+        if (!string.IsNullOrEmpty(ItemParams.sort))
+            LstItem= LstItem.Where(s => s.Name.Contains(ItemParams.sort) || s.SKUCode.Contains(ItemParams.sort));
+
+        LstItem= LstItem.Skip((ItemParams.PageNumber - 1) * ItemParams.pageSize).Take(ItemParams.pageSize);
+
+        return LstItem;
     }
 
-    public async Task<IEnumerable< Item?>> GetAllAsyncByConditionAsync(Expression<Func< Item, bool>> conditionExpression)
+    public async Task<IEnumerable<Item?>> GetAllAsyncByConditionAsync(Expression<Func<Item, bool>> conditionExpression)
     {
         return await _dbContext.Items.AsNoTracking().Where(conditionExpression).ToListAsync();
     }
 
-    public async Task< Item?> GetByConditionAsync(Expression<Func< Item, bool>> conditionExpression)
+    public async Task<Item?> GetByConditionAsync(Expression<Func<Item, bool>> conditionExpression)
     {
         return await _dbContext.Items.AsNoTracking().FirstOrDefaultAsync(conditionExpression);
     }
 
-    public async Task< Item?> UpdateAsync( Item Itemobj)
+    public async Task<Item?> UpdateAsync(Item Itemobj)
     {
-         Item? CheakObj = await _dbContext.Items.AsNoTracking().SingleOrDefaultAsync(x => x.Id == Itemobj.Id);
+        Item? CheakObj = await _dbContext.Items.AsNoTracking().SingleOrDefaultAsync(x => x.Id == Itemobj.Id);
         if (CheakObj is null)
         {
             return null;

@@ -1,5 +1,6 @@
 ﻿using HappyInventory.API.Helper.ResponseAPI;
 using HappyInventory.API.Models.DTOs.Warehouse;
+using HappyInventory.API.Models.Sharing;
 using HappyInventory.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,11 +22,11 @@ public class WarehouseController : ControllerBase
     }
 
     [HttpGet("get-all-Warehouse")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery]WarehouseParams WarehouseParams)
     {
         try
         {
-            List<WarehouseResponseDto?> lstWarehouses = await _warehouseService.GetAllAsync();
+            List<WarehouseResponseDto?> lstWarehouses = await _warehouseService.GetAllAsync(WarehouseParams);
             return lstWarehouses is null
                 ? BadRequest(new ResponseAPI(400))
                 : Ok(lstWarehouses);
