@@ -39,6 +39,7 @@ public class Program
         builder.Services.AddScoped<IItemRepositry, ItemRepositry>();
         builder.Services.AddScoped<IWarehouseService, WarehouseService>();
         builder.Services.AddScoped<IItemSservice, ItemSservice>();
+        builder.Services.AddScoped<ITokenServicecs, TokenService>();
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {

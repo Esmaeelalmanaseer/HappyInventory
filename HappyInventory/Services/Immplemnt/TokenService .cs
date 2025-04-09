@@ -26,7 +26,7 @@ public class TokenService : ITokenServicecs
         return false;
     }
 
-    public string createToken(IdentityUser user, List<string> Role)
+    public string createToken(User user, List<string> Role)
     {
         //create Claims
         var claims = new List<Claim>()

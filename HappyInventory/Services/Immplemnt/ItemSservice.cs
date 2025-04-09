@@ -34,14 +34,14 @@ public class ItemSservice : IItemSservice
 
     public async Task<bool> DeletAsync(int ItemobjID)
     {
-         Item? Itemobj = await _itemRepositry.GetByConditionAsync(x => x.Id == ItemobjID);
+        Item? Itemobj = await _itemRepositry.GetByConditionAsync(x => x.Id == ItemobjID);
         if (Itemobj is null) return false;
         return await _itemRepositry.DeletAsync(ItemobjID);
     }
 
     public async Task<List<ItemResponseDto?>> GetAllAsync()
     {
-        IEnumerable< Item> LstItems = await _itemRepositry.GetAllAsync();
+        IEnumerable<Item> LstItems = await _itemRepositry.GetAllAsync();
         if (LstItems.Any())
         {
             IEnumerable<ItemResponseDto> LstItemREsponse = _mapper.Map<IEnumerable<ItemResponseDto>>(LstItems);
@@ -50,27 +50,27 @@ public class ItemSservice : IItemSservice
         return null!;
     }
 
-    public async Task<List<ItemResponseDto?>> GetAllAsyncByConditionAsync(Expression<Func< Item, bool>> conditionExpression)
+    public async Task<List<ItemResponseDto?>> GetAllAsyncByConditionAsync(Expression<Func<Item, bool>> conditionExpression)
     {
-        IEnumerable< Item?> LstItem = await _itemRepositry.GetAllAsyncByConditionAsync(conditionExpression);
+        IEnumerable<Item?> LstItem = await _itemRepositry.GetAllAsyncByConditionAsync(conditionExpression);
 
         IEnumerable<ItemResponseDto?> LstItemREsponse = _mapper.Map<IEnumerable<ItemResponseDto>>(LstItem);
         return LstItemREsponse.ToList();
     }
 
-    public async Task<ItemResponseDto?> GetByConditionAsync(Expression<Func< Item, bool>> conditionExpression)
+    public async Task<ItemResponseDto?> GetByConditionAsync(Expression<Func<Item, bool>> conditionExpression)
     {
-         Item? ItemObj = await _itemRepositry.GetByConditionAsync(conditionExpression);
+        Item? ItemObj = await _itemRepositry.GetByConditionAsync(conditionExpression);
         if (ItemObj is null) throw new ArgumentException("Invalid Item Exiption");
         return _mapper.Map<ItemResponseDto>(ItemObj);
     }
 
     public async Task<ItemResponseDto?> UpdateAsync(ItemUpdateDto Itemobj)
     {
-         Item? ItemObj = await _itemRepositry.GetByConditionAsync(x => x.Id == Itemobj.Id);
+        Item? ItemObj = await _itemRepositry.GetByConditionAsync(x => x.Id == Itemobj.Id);
         if (ItemObj is null) throw new ArgumentException("Invalid Item Exiption");
-         Item ItemUpdate = _mapper.Map< Item>(Itemobj);
-         Item? Itemresponse = await _itemRepositry.UpdateAsync(ItemUpdate);
+        Item ItemUpdate = _mapper.Map<Item>(Itemobj);
+        Item? Itemresponse = await _itemRepositry.UpdateAsync(ItemUpdate);
         return _mapper.Map<ItemResponseDto>(Itemresponse);
     }
 }
