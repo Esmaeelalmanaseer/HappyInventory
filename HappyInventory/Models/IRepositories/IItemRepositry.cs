@@ -6,6 +6,8 @@ namespace HappyInventory.API.Models.IRepositories;
 
 public interface IItemRepositry
 {
+    Task<IEnumerable<Item>> GetAllAsync();
+
     Task<IEnumerable< Item>> GetAllAsync(ItemParams ItemParams);
 
 
@@ -22,4 +24,6 @@ public interface IItemRepositry
 
 
     Task<bool> DeletAsync(int  ItemobjID);
+
+    Task<IEnumerable<Item>> Order(Expression<Func<Item, object>> condition, bool Desc);
 }

@@ -7,8 +7,10 @@ namespace HappyInventory.API.Services.Interfaces;
 
 public interface IItemSservice
 {
-    Task<List<ItemResponseDto?>> GetAllAsync(ItemParams ItemParams);
 
+    Task<List<ItemResponseDto?>> GetAllAsync();
+
+    Task<List<ItemResponseDto?>> GetAllAsync(ItemParams ItemParams);
 
     Task<List<ItemResponseDto?>> GetAllAsyncByConditionAsync(Expression<Func< Item, bool>> conditionExpression);
 
@@ -23,4 +25,6 @@ public interface IItemSservice
 
 
     Task<bool> DeletAsync(int ItemobjID);
+
+    Task<List<ItemResponseDto>> Order(Expression<Func<Item, object>> condition, bool Desc);
 }

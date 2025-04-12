@@ -45,10 +45,18 @@ public class WarehouseService : IWarehouseService
         IEnumerable<Warehouse> LstWarehouse = await _warehouseRepositry.GetAllAsync(WarehouseParams);
         if (LstWarehouse.Any())
         {
-            IEnumerable<WarehouseResponseDto> LstItemREsponse = _mapper.Map<IEnumerable<WarehouseResponseDto>>(LstWarehouse);
-            return LstItemREsponse.ToList()!;
+            IEnumerable<WarehouseResponseDto> LsWarehousesponse = _mapper.Map<IEnumerable<WarehouseResponseDto>>(LstWarehouse);
+            return LsWarehousesponse.ToList()!;
         }
         return null!;
+    }
+
+    public async Task<List<WarehouseResponseDto?>> GetAllAsync()
+    {
+        var LstWarehouse=await _warehouseRepositry.GetAllAsync();
+
+        IEnumerable<WarehouseResponseDto> LstItemREsponse = _mapper.Map<IEnumerable<WarehouseResponseDto>>(LstWarehouse);
+        return LstItemREsponse.ToList()!;
     }
 
     public async Task<List<WarehouseResponseDto?>> GetAllAsyncByConditionAsync(Expression<Func<Warehouse, bool>> conditionExpression)

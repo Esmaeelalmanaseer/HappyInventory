@@ -2,6 +2,7 @@
 using HappyInventory.API.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -28,17 +29,15 @@ public class TokenService : ITokenServicecs
 
     public string createToken(User user, List<string> Role)
     {
-        //create Claims
-        var claims = new List<Claim>()
-            {
-                new Claim(ClaimTypes.Email,user.Email),
+        var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Email, user.Email), 
+        new Claim(ClaimTypes.Name, user.Email) ,
+    };
 
-            };
         claims.AddRange(Role.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        //JwtSecurity Token Parametrs
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
@@ -47,8 +46,8 @@ public class TokenService : ITokenServicecs
             claims: claims,
             expires: DateTime.UtcNow.AddDays(1),
             signingCredentials: credentials
-            );
-        //return Token
+        );
+
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

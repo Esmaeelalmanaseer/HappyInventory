@@ -49,6 +49,11 @@ public class ItemRepositry : IItemRepositry
         return LstItem;
     }
 
+    public async Task<IEnumerable<Item>> GetAllAsync()
+    {
+        return await _dbContext.Items.AsNoTracking().ToListAsync();
+    }
+
     public async Task<IEnumerable<Item?>> GetAllAsyncByConditionAsync(Expression<Func<Item, bool>> conditionExpression)
     {
         return await _dbContext.Items.AsNoTracking().Where(conditionExpression).ToListAsync();
@@ -57,6 +62,13 @@ public class ItemRepositry : IItemRepositry
     public async Task<Item?> GetByConditionAsync(Expression<Func<Item, bool>> conditionExpression)
     {
         return await _dbContext.Items.AsNoTracking().FirstOrDefaultAsync(conditionExpression);
+    }
+
+    public async Task<IEnumerable<Item>> Order(Expression<Func<Item, object>> condition, bool Desc)
+    {
+        if(Desc)
+            return await _dbContext.Items.AsNoTracking().OrderByDescending(condition).ToListAsync();
+        return await _dbContext.Items.AsNoTracking().OrderBy(condition).ToListAsync();
     }
 
     public async Task<Item?> UpdateAsync(Item Itemobj)

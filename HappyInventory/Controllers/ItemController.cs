@@ -3,13 +3,15 @@ using HappyInventory.API.Models.DTOs.Item;
 using HappyInventory.API.Models.Sharing;
 using HappyInventory.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HappyInventory.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ItemController : ControllerBase
-{
+{ 
     private readonly IItemSservice _itemService;
     private readonly ILogger<ItemController> _logger;
 
@@ -22,6 +24,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpGet("get-all-items")]
+    [Authorize(Roles = "Admin,Management,Auditor")]
     public async Task<IActionResult> GetAll([FromQuery] ItemParams ItemParamsObj)
     {
         try
@@ -56,6 +59,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpPost("add-item")]
+    [Authorize(Roles = "Admin,Management")]
     public async Task<IActionResult> Add(ItemCreateDto itemCreateDto)
     {
         try
@@ -73,6 +77,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpPut("update-item")]
+    [Authorize(Roles = "Admin,Management")]
     public async Task<IActionResult> Update(ItemUpdateDto itemUpdateDto)
     {
         try
@@ -90,6 +95,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpDelete("delete-item/{id}")]
+    [Authorize(Roles = "Admin,Management")]
     public async Task<IActionResult> Delete(int id)
     {
         try

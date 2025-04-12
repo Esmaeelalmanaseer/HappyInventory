@@ -45,6 +45,11 @@ public class WarehouseRepositry : IWarehouseRepositry
         return LstWarehouse;
     }
 
+    public async Task<IEnumerable<Warehouse>> GetAllAsync()
+    {
+        return await _dbContext.Warehouses.AsNoTracking().ToListAsync();
+    }
+
     public async Task<IEnumerable<Warehouse?>> GetAllAsyncByConditionAsync(Expression<Func<Warehouse, bool>> conditionExpression)
     {
         return await _dbContext.Warehouses.AsNoTracking().Where(conditionExpression).ToListAsync();

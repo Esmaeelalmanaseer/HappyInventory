@@ -6,6 +6,7 @@ namespace HappyInventory.API.Models.IRepositories;
 
 public interface IWarehouseRepositry
 {
+    Task<IEnumerable<Warehouse>> GetAllAsync();
 
     Task<IEnumerable<Warehouse>> GetAllAsync(WarehouseParams WarehouseParams);
 

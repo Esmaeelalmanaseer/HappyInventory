@@ -1,7 +1,9 @@
 ﻿using HappyInventory.API.Helper.ResponseAPI;
 using HappyInventory.API.Models.DTOs.Auth;
+using HappyInventory.API.Models.DTOs.User;
 using HappyInventory.API.Models.Entities;
 using HappyInventory.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +30,7 @@ public class AuthController : ControllerBase
         {
             Email = requist.Email?.Trim(),
             UserName = requist.Email?.Trim(),
-            FullName= requist.FullName
+            FullName= requist.FullName,
         };
 
         var usercreated = await _usermanager.CreateAsync(user, requist.Password);
@@ -96,4 +98,114 @@ public class AuthController : ControllerBase
         return Ok(responce);
 
     }
+
+    [HttpGet("get-all")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = _usermanager.Users.ToList();
+
+        var userList = new List<UserDto>();
+        foreach (var user in users)
+        {
+            var roles = await _usermanager.GetRolesAsync(user);
+            userList.Add(new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+                Role = roles.FirstOrDefault() ?? "",
+                Active = user.IsActive
+            });
+        }
+
+        return Ok(userList);
+    }
+
+    [HttpGet("get-by-id/{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetUserById(string id)
+    {
+        var user = await _usermanager.FindByIdAsync(id);
+        if (user is null) return NotFound();
+
+        var roles = await _usermanager.GetRolesAsync(user);
+        return Ok(new UserDto
+        {
+            Id = user.Id,
+            Email = user.Email,
+            FullName = user.FullName,
+            Role = roles.FirstOrDefault() ?? "",
+            Active = user.IsActive
+        });
+    }
+    [HttpPost("create")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> CreateUser([FromBody] RegisterRequistDto req)
+    {
+        var user = new User
+        {
+            Email = req.Email,
+            UserName = req.Email,
+            FullName = req.FullName,
+            IsActive = req.IsActive
+        };
+
+        var result = await _usermanager.CreateAsync(user, req.Password);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        var roleResult = await _usermanager.AddToRoleAsync(user, req.Role);
+        if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
+
+        return Ok();
+    }
+
+    [HttpPut("update")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto dto)
+    {
+        var user = await _usermanager.FindByIdAsync(dto.Id);
+        if (user == null) return NotFound();
+
+        user.FullName = dto.FullName;
+        user.IsActive = dto.Active;
+
+        var result = await _usermanager.UpdateAsync(user);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        var currentRoles = await _usermanager.GetRolesAsync(user);
+        await _usermanager.RemoveFromRolesAsync(user, currentRoles);
+        await _usermanager.AddToRoleAsync(user, dto.Role);
+
+        return Ok();
+    }
+
+    [HttpDelete("delete/{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteUser(string id)
+    {
+        var user = await _usermanager.FindByIdAsync(id);
+        if (user is null) return NotFound();
+
+        if (user.Email == "admin@happywarehouse.com")
+            return BadRequest("Cannot delete admin user");
+
+        IdentityResult? result = await _usermanager.DeleteAsync(user);
+        return result.Succeeded ? Ok() : BadRequest(result.Errors);
+    }
+
+    [HttpPost("change-password")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
+    {
+        var user = await _usermanager.FindByIdAsync(dto.UserId);
+        if (user == null) return NotFound();
+
+        var token = await _usermanager.GeneratePasswordResetTokenAsync(user);
+        var result = await _usermanager.ResetPasswordAsync(user, token, dto.NewPassword);
+
+        return result.Succeeded ? Ok() : BadRequest(result.Errors);
+    }
+
+
 }

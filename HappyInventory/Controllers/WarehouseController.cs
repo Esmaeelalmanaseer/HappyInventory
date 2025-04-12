@@ -2,12 +2,14 @@
 using HappyInventory.API.Models.DTOs.Warehouse;
 using HappyInventory.API.Models.Sharing;
 using HappyInventory.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HappyInventory.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class WarehouseController : ControllerBase
 {
     private readonly IWarehouseService _warehouseService;
@@ -22,6 +24,7 @@ public class WarehouseController : ControllerBase
     }
 
     [HttpGet("get-all-Warehouse")]
+    [Authorize(Roles = "Admin,Management,Auditor")]
     public async Task<IActionResult> GetAll([FromQuery]WarehouseParams WarehouseParams)
     {
         try
@@ -39,6 +42,7 @@ public class WarehouseController : ControllerBase
     }
 
     [HttpGet("get-by-id/{id}")]
+    [Authorize(Roles = "Admin,Management,Auditor")]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -56,6 +60,7 @@ public class WarehouseController : ControllerBase
     }
 
     [HttpPost("Add-Warehouse")]
+    [Authorize(Roles = "Admin,Management")]
     public async Task<IActionResult> Add(WarehouseCreateDto warehouseCreateDto)
     {
         try
@@ -73,6 +78,7 @@ public class WarehouseController : ControllerBase
     }
 
     [HttpPut("update-Warehouse")]
+    [Authorize(Roles = "Admin,Management")]
     public async Task<IActionResult> Update(WarehouseUpdateDto warehouseUpdateDto)
     {
         try
@@ -90,6 +96,7 @@ public class WarehouseController : ControllerBase
     }
 
     [HttpDelete("Delete-Warehouse/{id}")]
+    [Authorize(Roles = "Admin,Management")]
     public async Task<IActionResult> Delete(int id)
     {
         try

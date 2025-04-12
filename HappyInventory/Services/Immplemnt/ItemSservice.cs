@@ -51,6 +51,13 @@ public class ItemSservice : IItemSservice
         return null!;
     }
 
+    public async Task<List<ItemResponseDto?>> GetAllAsync()
+    {
+        var LstItem = await _itemRepositry.GetAllAsync();
+        IEnumerable<ItemResponseDto> LstItemREsponse = _mapper.Map<IEnumerable<ItemResponseDto>>(LstItem);
+        return LstItemREsponse.ToList()!;
+    }
+
     public async Task<List<ItemResponseDto?>> GetAllAsyncByConditionAsync(Expression<Func<Item, bool>> conditionExpression)
     {
         IEnumerable<Item?> LstItem = await _itemRepositry.GetAllAsyncByConditionAsync(conditionExpression);
@@ -64,6 +71,13 @@ public class ItemSservice : IItemSservice
         Item? ItemObj = await _itemRepositry.GetByConditionAsync(conditionExpression);
         if (ItemObj is null) throw new ArgumentException("Invalid Item Exiption");
         return _mapper.Map<ItemResponseDto>(ItemObj);
+    }
+
+    public async Task<List<ItemResponseDto>> Order(Expression<Func<Item, object>> condition, bool Desc)
+    {
+        var LstItem = await _itemRepositry.Order(condition, Desc);
+        IEnumerable<ItemResponseDto> LstItemREsponse = _mapper.Map<IEnumerable<ItemResponseDto>>(LstItem);
+        return LstItemREsponse.ToList()!;
     }
 
     public async Task<ItemResponseDto?> UpdateAsync(ItemUpdateDto Itemobj)
